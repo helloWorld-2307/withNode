@@ -12,7 +12,7 @@ import express from "express";
 const app = express();
 
 app.use(cors({
-  origin: 'https://with-node-vc7s.vercel.app', // Sirf apne Vercel link ko allow karo
+  origin: '*', // Sirf apne Vercel link ko allow karo
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
