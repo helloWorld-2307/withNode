@@ -7,6 +7,15 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createSessionStore } from "./sessionStore.js";
+import cors from "cors";
+import express from "express";
+const app = express();
+
+app.use(cors({
+  origin: 'https://with-node-vc7s.vercel.app', // Sirf apne Vercel link ko allow karo
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, ".env"), override: true });
