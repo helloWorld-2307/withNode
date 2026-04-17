@@ -7,15 +7,6 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createSessionStore } from "./sessionStore.js";
-import cors from "cors";
-import express from "express";
-const app = express();
-
-app.use(cors({
-  origin: '*', // Sirf apne Vercel link ko allow karo
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
-}));
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, ".env"), override: true });
@@ -89,21 +80,9 @@ function text(res, statusCode, body, extraHeaders = {}) {
   res.end(body);
 }
 
-function corsHeaders(req) {
-  const defaultOrigin = "http://localhost:3000";
-  const origin = process.env.CORS_ORIGIN?.trim() || defaultOrigin;
-  const reqOrigin = req.headers.origin;
-
-  if (origin === "*") {
-    return { "Access-Control-Allow-Origin": "*" };
-  }
-
-  if (reqOrigin && reqOrigin === origin) {
-    return { "Access-Control-Allow-Origin": origin, Vary: "Origin" };
-  }
-
-  // non-browser / same-origin / unknown origin: don't block, but also don't open CORS
-  return {};
+// ✅ FIXED: Always return * to allow all origins
+function corsHeaders() {
+  return { "Access-Control-Allow-Origin": "*" };
 }
 
 async function readJson(req) {
@@ -153,8 +132,9 @@ async function startServer() {
     const url = new URL(req.url || "/", "http://localhost");
     const method = (req.method || "GET").toUpperCase();
 
-    const cors = corsHeaders(req);
+    const cors = corsHeaders();
 
+    // ✅ FIXED: Handle OPTIONS preflight properly with all needed headers
     if (method === "OPTIONS") {
       res.writeHead(204, {
         ...cors,
